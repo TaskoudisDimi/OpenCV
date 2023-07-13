@@ -1,12 +1,5 @@
 
 
-
-
-
-
-
-
-
 # # Male
 # import cv2
 # import numpy as np
@@ -186,20 +179,11 @@ for i in range(230,231):
 
 
 
-
-
-
-
-
-
-
 # image = cv2.imread("C:/Users/ASUS/Desktop/thesis/My_Codes/OpenCV/test.png")
 
 
 # image[700:720 , 260:280, :]   = [0, 0, 255]
 
 # cv2.imwrite("C:/Users/ASUS/Desktop/thesis/My_Codes/OpenCV/image.png", image)
-
-
 
 
