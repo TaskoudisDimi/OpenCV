@@ -7,7 +7,7 @@ import mediapipe as mp
 
 
 class handDetector():
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5, trackCon=0.5):
+    def __init__(self, mode=False, maxHands=2, detectionCon=1, trackCon=1):
 
         self.mode = mode
         self.maxHands = maxHands        
@@ -18,20 +18,29 @@ class handDetector():
         self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
-    def findHands(self, img):
+    def findHands(self, img, draw = True):
         img = img[500:1500, 500:1000, :]
         imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        results = self.hands.process(imgRGB)
+        self.results = self.hands.process(imgRGB)
 
-        if results.multi_hand_landmarks:
-            for handLms in results.multi_hand_landmarks:
-                for id, lm in enumerate(handLms.landmark):
+        if self.results.multi_hand_landmarks:
+            for handLms in self.results.multi_hand_landmarks:
+                if draw:
+                    self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
+                
+                    
+                
+    def findPosition(self, img, handNo = 0, draw = True):
+        lmList = []
+        if self.results.multi_hand_landmarks:
+            myHand = self.results.multi_hand_landmarks[handNo]
+            for id, lm in enumerate(myHand.landmark):
                     h, w, c = img.shape
                     cx, cy = int(lm.x * w), int(lm.y * h)
-                    cv.circle(img, (cx, cy), 25, (255,0,255), cv.FILLED)
-                    
-                self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
-
+                    lmList.append([id, cx, cy])
+                    if draw:
+                        cv.circle(img, (cx, cy), 15, (255,0,255), cv.FILLED)
+        return lmList
 
 
 
@@ -40,20 +49,27 @@ def main():
     pTime = 0
     ctime = 0
     
-    #Example Video
-    video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Video1.mp4')
-
+    
     while True:
+        #Example Video
+        video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Video1.mp4')
+        detector = handDetector()
         success, img = video.read()
+
+        img = detector.findHands(img)
+        lmList = detector.findPosition(img)
+        if(len(lmList) != 0):
+            print(lmList[4])
+
         cTime = time.time()
         fps = 1/(cTime-pTime)
         pTime = cTime
         cv.putText(img, str(int(fps)), (10,10), cv.FONT_HERSHEY_PLAIN, 3, (255,0,255), 3)
 
-        cv.imshow('Video', img)
+        cv.imshow('Test', img)
         cv.waitKey(1)
 
 
+main()
 
-if __name__ == "__main__":
-    main()
+    
