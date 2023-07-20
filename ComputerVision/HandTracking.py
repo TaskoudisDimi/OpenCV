@@ -29,7 +29,7 @@ while True:
             for id, lm in enumerate(handLms.landmark):
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
-                cv.circle(img, (cx, cy), 25, (255,0,255), cv.FILLED)
+                cv.circle(img, (cx, cy), 15, (255,0,255), cv.FILLED)
                 
                     
                 

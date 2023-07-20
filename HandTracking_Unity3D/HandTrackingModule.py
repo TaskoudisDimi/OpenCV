@@ -7,7 +7,7 @@ import mediapipe as mp
 
 
 class handDetector():
-    def __init__(self, mode=False, maxHands=2, detectionCon=1, trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=1, trackCon=0.5):
 
         self.mode = mode
         self.maxHands = maxHands        
@@ -71,6 +71,6 @@ def main():
         cv.waitKey(1)
 
 
-main()
+# main()
 
     

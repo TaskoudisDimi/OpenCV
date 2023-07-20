@@ -65,7 +65,5 @@ def main():
         cv.waitKey(1)
 
 
-
-
 main()
 
