@@ -2,7 +2,7 @@
 import cv2 as cv
 
 
-img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Resources/Photos/group 1.jpg')
+img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/group1.jpg')
 
 
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
