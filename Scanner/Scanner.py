@@ -5,13 +5,13 @@ frameWidth = 640
 frameHeight = 480
 
 # Initialize the webcam capture
-cap = cv.VideoCapture(0)
+# cap = cv.VideoCapture(0)
 
-cap.set(3, frameWidth) #property ID 3 for width
-cap.set(4, frameHeight) #property ID 4 for height
-cap.set(10, 150) #property ID 10 for brightness
+# cap.set(3, frameWidth) #property ID 3 for width
+# cap.set(4, frameHeight) #property ID 4 for height
+# cap.set(10, 150) #property ID 10 for brightness
 
-def ImageProcessing(img):
+def preProcessing(img):
     imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     # Apply Gaussian blur to reduce noise in the grayscale image
     #  This line applies a Gaussian blur to the grayscale image (imgGray). The (5, 5) 
@@ -35,14 +35,39 @@ def ImageProcessing(img):
 
     return imgThres
     
+def getContours(img):
+    biggest = np.array([])
+    maxArea = 0
+    contours, hierarchy = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+    for cnt in contours:
+        area = cv.contourArea(cnt)
+        if area > 500:
+            # cv.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
+            peri = cv.arcLength(cnt, True)
+            approx = cv.approxPolyDP(cnt, 0.002*peri, True)
+            if area > maxArea and len(approx) == 4:
+                biggest = approx
+                maxArea = area
+    cv.drawContours(imgContour, cnt, -1, (255, 0, 0), 20)
+    return biggest
+
+
+def getWarp(img, biggest):
+    pass
 
 while True:
     # Capture a frame
-    ret, img = cap.read()
-    cv.resize(img, (frameWidth, frameHeight))
-    imgThress = ImageProcessing(img)
+    img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Scanner/Resources/paper.jpg')
+    # ret, img = cap.read()
+    img = cv.resize(img, (640, 480))
+    imgContour = img.copy()
+
+    imgThres = preProcessing(imgContour)
+    biggest = getContours(imgThres)
     # Display the captured frame
-    cv.imshow('Webcam Capture', imgThress)
+    getWarp(img, biggest)
+
+    cv.imshow('Webcam Capture', imgContour)
 
 
     # Break the loop when the user presses the 'q' key
@@ -50,5 +75,5 @@ while True:
         break
 
 # Release the camera and close the OpenCV window
-cap.release()
+# cap.release()
 cv.destroyAllWindows()

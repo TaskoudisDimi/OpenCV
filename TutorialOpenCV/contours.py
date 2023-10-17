@@ -1,10 +1,13 @@
 import cv2 as cv
 import numpy as np
 
-img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Resources/Photos/cat.jpg')
+img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
 
 cv.imshow('Cat', img)
 
+# uint8 (unsigned 8-bit integer) is a data type that can represent integer values in the range from 0 to 255. 
+# It's commonly used to represent pixel values in grayscale and color images. For grayscale images, 
+# each pixel can have a value between 0 (black) and 255 (white).
 blank = np.zeros(img.shape, dtype='uint8')
 
 
