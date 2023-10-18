@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 
 img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Resources/Photos/cat.jpg')
@@ -67,6 +68,31 @@ img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Resourc
 # # Copping
 # cropped = img[50:200, 200:400]
 # cv.imshow('Cat', cropped)
+
+
+# def preProcessing(img):
+#     imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+#     # Apply Gaussian blur to reduce noise in the grayscale image
+#     #  This line applies a Gaussian blur to the grayscale image (imgGray). The (5, 5) 
+#     # argument specifies the size of the kernel (a 5x5 Gaussian kernel is used), 
+#     # and 1 represents the standard deviation of the Gaussian distribution. 
+#     # Gaussian blurring is often used to reduce noise in the image.
+#     imgBlur = cv.GaussianBlur(imgGray, (5,5), 1)
+#     # Apply Gaussian blur to reduce noise in the grayscale image
+#     # It detects edges in the image based on intensity gradients. 
+#     # The values 200 and 200 are the lower and upper thresholds for edge detection. 
+#     imgCanny = cv.Canny(img, 200, 200)
+#     # Define a kernel for morphological operations
+#     # This line defines a 5x5 kernel using NumPy, which will be used for morphological operations like dilation and erosion.
+#     kernel = np.ones((5,5))
+#     # Dilate the edges to make them thicker
+#     # Dilation thickens the edges
+#     imgDial = cv.dilate(imgCanny, kernel, iterations=2)
+#     # Erode the dilated image to make the edges thinner and more pronounced
+#     # This line erodes the dilated image (imgDial) using the same kernel, which makes the edges thinner and more pronounced.
+#     imgThres = cv.erode(imgDial, kernel, iterations=1)
+
+#     return imgThres
 
 
 cv.waitKey(0)
