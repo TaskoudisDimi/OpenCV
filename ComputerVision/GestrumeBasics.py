@@ -21,7 +21,9 @@ minVol = volRange[0]
 maxVol = volRange[1]
 
 
-video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Gym.mp4')
+# video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Gym.mp4')
+
+video = cv.VideoCapture(0)
 
 pTime = 0
 
@@ -32,7 +34,7 @@ volPer = 0
 
 while True:
     succces, img = video.read()
-    img = img[150:1500, 150:1500, :]
+    # img = img[150:1500, 150:1500, :]
 
     img = detector.findHands(img)
     lmList = detector.findPosition(img, draw=False)
@@ -56,7 +58,7 @@ while True:
         vol = np.interp(length, [50, 300], [minVol, maxVol])
         volBar = np.interp(length, [50, 300], [400, 150])
         volPer = np.interp(length, [50, 300], [0,100])
-        print(int(length), vol)
+        # print(int(length), vol)
         volume.SetMasterVolumeLevel(vol, None)
 
         if length < 50:

@@ -1,11 +1,7 @@
 from flask import Flask, render_template, request
 
-# TODO: Scanner
 # TODO: Drag and Drop
-# TODO: FaceRecognition
 # TODO: Android
-# TODO: GymTracker
-# TODO: ComputerVision Tutorial
 
 app = Flask(__name__)
 

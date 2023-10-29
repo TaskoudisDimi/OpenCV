@@ -7,8 +7,8 @@ import mediapipe as mp
 
 
 #Example Video
-video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Video3.mp4')
-
+# video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Video3.mp4')
+video = cv.VideoCapture(0)
 
 mpHands = mp.solutions.hands
 hands = mpHands.Hands()

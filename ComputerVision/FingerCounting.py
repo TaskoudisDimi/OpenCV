@@ -5,19 +5,22 @@ import HandTrackingModule as track
 
 
 
-video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video3.mp4')
+# video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video3.mp4')
+video = cv.VideoCapture(0)
 pTime = 0
 
 
-folderPath = "C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Images/"
+# folderPath = "C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Images/"
+folderPath = "D:/Programming/OpenCV/OpenCV/ComputerVision/Images/"
+
 myList = os.listdir(folderPath)
-print(myList)
+# print(myList)
 
 overlayList = []
 
 for imPath in myList:
     image = cv.imread(f'{folderPath}/{imPath}')
-    print(image.shape)
+    # print(image.shape)
     overlayList.append(image)
 
 
@@ -28,7 +31,7 @@ tipIds = [4, 8, 12, 16, 20]
 
 while True:
     success, img = video.read()
-    img = img[500:1300, 350:1700, :]
+    # img = img[500:1300, 350:1700, :]
     detector.findHands(img)
 
     lmList = detector.findPosition(img, draw=False)

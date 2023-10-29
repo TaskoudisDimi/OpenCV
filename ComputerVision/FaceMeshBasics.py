@@ -3,7 +3,8 @@ import time
 import mediapipe as mp
 
 
-video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video3.mp4')
+# video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video3.mp4')
+video = cv.VideoCapture(0)
 pTime = 0
 
 mpDraw = mp.solutions.drawing_utils
@@ -13,7 +14,7 @@ drawSpec = mpDraw.DrawingSpec(thickness = 1, circle_radius = 2)
 
 while True:
     success, img = video.read()
-    img = img[500:1300, 350:1700, :]
+    # img = img[500:1300, 350:1700, :]
     results = faceMesh.process(img)
     if results.multi_face_landmarks:
         for face in results.multi_face_landmarks:

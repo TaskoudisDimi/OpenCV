@@ -3,7 +3,8 @@ import cv2 as cv
 from PoseModule import poseDetector
 import numpy as np
 
-video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video2.mp4')
+# video = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/Videos/Video2.mp4')
+video = cv.VideoCapture(0)
 
 detector = poseDetector()
 
@@ -13,7 +14,7 @@ dir = 0
 while True:
     success, img = video.read()
     # img = cv.resize(img, (850,640))
-    img = cv.resize(img, (450,640))
+    # img = cv.resize(img, (450,640))
     img = detector.findPose(img, False)
     lmList = detector.findPosition(img, False)
     # print(lmList)
