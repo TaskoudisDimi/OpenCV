@@ -13,17 +13,40 @@ def home():
 
 
 
-@app.route('/EditImage', methods=['GET'])
+@app.route('/EditImage', methods=['GET', 'POST'])
 def EditImage():
     return render_template('EditImage.html')
+
+@app.route('/ConertToGray', methods=['POST'])
+def ConertToGray():
+    
+    return render_template('EditImage.html')
+
+
+
 
 @app.route('/EditVideo', methods=['GET'])
 def EditVideo():
     return render_template('EditVideo.html')
 
+
+
 @app.route('/FingerCounting', methods=['GET'])
 def FingerCounting():
     return render_template('FingerCounting.html')
+
+
+@app.route('/GetFingers', methods=['GET'])
+def GetFingers():
+    return render_template('FingerCounting.html')
+
+
+
+
+
+
+
+
 
 @app.route('/FaceRecognition', methods=['GET'])
 def FaceRecognition():
