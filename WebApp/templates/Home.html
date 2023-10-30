@@ -4,21 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     
-    <form method="get">
-        <a href="/EditImage">Edit Image</a>
+    <form action="/EditImage" method="get">
+        <button type="submit" class="btn btn-primary">Edit Image</button>
+    </form>
+    
+    <form action="/EditVideo" method="get">
+        <button type="submit" class="btn btn-primary">Edit Video</button>
     </form>
 
-
-    <form method="get">
-        <a href="/HandTracking">Hand Tracking</a>
+    <form action="/FingerCounting" method="get">
+        <button type="submit" class="btn btn-primary">Finger Counting</button>
     </form>
 
-
-    <form method="get">
-        <a href="/FaceRecognition">Face Recognition/Detection</a>
+    <form action="/FaceRecognition" method="get">
+        <button type="submit" class="btn btn-primary">Face Recognition</button>
     </form>
+
+    <form action="/MouseControl" method="get">
+        <button type="submit" class="btn btn-primary">Mouse Control</button>
+    </form>
+
+    <form action="/GymTracker" method="get">
+        <button type="submit" class="btn btn-primary">Gym Tracker</button>
+    </form>
+
+    <form action="/Scanner" method="get">
+        <button type="submit" class="btn btn-primary">Scanner</button>
+    </form>
+
+    <!-- Add Bootstrap and jQuery JS links -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Finger Counting</title>
+  <script src="/WebApp/js/script.js" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+
+  <h3>Finger Counting</h3>
+  <div>
+    <button id="cameraButton">Open Camera</button>
+    <input type="file" id="videoInput" accept="video/mp4" />
+  </div>
+  <div id="videoContainer">
+    <video id="videoPlayer" controls autoplay></video>
+  </div>
+
+  
+  <form action="/" method="get"><button type="submit" class="btn btn-primary">Back</button></form>
+
+  <!-- Add Bootstrap and jQuery JS links -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
