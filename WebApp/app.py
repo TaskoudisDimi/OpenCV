@@ -1,4 +1,8 @@
 from flask import Flask, render_template, request
+import base64
+import io
+import numpy as np
+import cv2 as cv
 
 # TODO: Drag and Drop
 # TODO: Android
@@ -12,15 +16,44 @@ def home():
     return render_template('Home.html')
 
 
+#######
+# 1) Congert To Gray 
+# 2) Segmetation and replace
+# 3) Adaptive threshold
+# 4) Resize 
+# 5) Gym tracker
+# 6) Realtime Face Recognizer
+# 7) Mouse control, Volume control
 
 @app.route('/EditImage', methods=['GET', 'POST'])
 def EditImage():
     return render_template('EditImage.html')
 
+def FromBGR_To_Gray(img):
+    # Read the image data from the file-like object
+    image_data = img.read()
+    nparr = np.frombuffer(image_data, np.uint8)
+    image = cv.imdecode(nparr, cv.IMREAD_COLOR)
+
+    # Convert the image to grayscale
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+    return gray
+
 @app.route('/ConertToGray', methods=['POST'])
 def ConertToGray():
-    
+    if 'image' in request.files:
+        image = request.files['image']
+        gray = FromBGR_To_Gray(image)
+
+        # Convert the grayscale image to a PNG byte array
+        img_buffer = cv.imencode('.png', gray)[1].tobytes()
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+
+        return render_template('EditImage.html', gray_image=img_str)
+
     return render_template('EditImage.html')
+
 
 
 

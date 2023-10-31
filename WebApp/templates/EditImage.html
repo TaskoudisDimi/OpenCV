@@ -11,16 +11,21 @@
     
     <h3>Edit Image</h3>
 
-    <form action="/ConertToGray" method="post">
+    <form action="/ConertToGray" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
         <button type="submit" class="btn btn-primary">
             Convert To Gray
         </button>
     </form>
 
+    <!-- Display the grayscale image -->
+    {% if gray_image %}
+        <img src="data:image/png;base64, {{ gray_image }}" alt="Grayscale Image">
+    {% endif %}
 
-
-
-    <form action="/" method="get"><button type="submit" class="btn btn-secondary">Back</button></form>
+    <form action="/" method="get">
+        <button type="submit" class="btn btn-secondary">Back</button>
+    </form>
 
     <!-- Add Bootstrap and jQuery JS links -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
