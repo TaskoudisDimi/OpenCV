@@ -11,17 +11,104 @@
     
     <h3>Edit Image</h3>
 
-    <form action="/ConertToGray" method="post" enctype="multipart/form-data">
+    <!-- Upload -->
+    <form action="/display_image" method="post" enctype="multipart/form-data">
         <input type="file" name="image" accept="image/*">
+        <button type="submit" class="btn btn-primary">
+            Upload Image
+        </button>
+    </form> 
+    
+    {% if uploaded_image %}
+        <h4>Uploaded Image</h4>
+        <img src="{{ uploaded_image }}" alt="Uploaded Image">
+    {% endif %}
+
+    <!-- Gray -->
+    <form action="/ConertToGray" method="post" enctype="multipart/form-data">
         <button type="submit" class="btn btn-primary">
             Convert To Gray
         </button>
-    </form>
+    </form> 
 
-    <!-- Display the grayscale image -->
     {% if gray_image %}
         <img src="data:image/png;base64, {{ gray_image }}" alt="Grayscale Image">
     {% endif %}
+
+    <!-- Laplacian -->
+    <form action="/ConvertToLap" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Convert To Laplacian
+        </button>
+    </form> 
+
+    {% if lap_image %}
+        <img src="data:image/png;base64, {{ lap_image }}" alt="Laplacian Image">
+    {% endif %}
+
+     <!-- Canny -->
+     <form action="/ConvertToCanny" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Convert To Canny
+        </button>
+    </form> 
+
+    {% if canny_image %}
+        <img src="data:image/png;base64, {{ canny_image }}" alt="Cany Image">
+    {% endif %}
+
+
+     <!-- Red -->
+     <form action="/ConvertToRed" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Convert To Red
+        </button>
+    </form> 
+
+    {% if red_image %}
+        <img src="data:image/png;base64, {{ red_image }}" alt="Cany Image">
+    {% endif %}
+
+
+     <!-- Blue -->
+     <form action="/ConvertToBlue" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Convert To Blue
+        </button>
+    </form> 
+
+    {% if blue_image %}
+        <img src="data:image/png;base64, {{ blue_image }}" alt="Cany Image">
+    {% endif %}
+
+     <!-- Green -->
+     <form action="/ConvertToGreen" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Convert To Green
+        </button>
+    </form> 
+
+    {% if green_image %}
+        <img src="data:image/png;base64, {{ green_image }}" alt="Cany Image">
+    {% endif %}
+
+
+    <!-- Detect Faces -->
+    <form action="/Detect_Faces" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Detect Faces
+        </button>
+    </form> 
+
+    {% if detect_image %}
+        <img src="data:image/png;base64, {{ detect_image }}" alt="Cany Image">
+    {% endif %}
+
+
+
+
+
+    <a href="{{ url_for('download_image') }}" download="image.png" class="btn btn-primary">Download Image</a>
 
     <form action="/" method="get">
         <button type="submit" class="btn btn-secondary">Back</button>

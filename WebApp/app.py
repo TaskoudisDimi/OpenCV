@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import base64
 import io
 import numpy as np
 import cv2 as cv
-
+from Utils import FromBGR_To_Gray, FromGray_To_Lap, FromGray_To_Canny, FromImage_To_Blue, FromImage_To_Green, FromImage_To_Red, Detect_Faces
 # TODO: Drag and Drop
 # TODO: Android
 
@@ -18,7 +18,7 @@ def home():
 
 #######
 # 1) Congert To Gray 
-# 2) Segmetation and replace
+# 2) Segmetation and replace (Adaptive Thresholding, Laplacian, Canny)
 # 3) Adaptive threshold
 # 4) Resize 
 # 5) Gym tracker
@@ -29,30 +29,143 @@ def home():
 def EditImage():
     return render_template('EditImage.html')
 
-def FromBGR_To_Gray(img):
-    # Read the image data from the file-like object
-    image_data = img.read()
-    nparr = np.frombuffer(image_data, np.uint8)
-    image = cv.imdecode(nparr, cv.IMREAD_COLOR)
+uploaded_image_data = None
 
-    # Convert the image to grayscale
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-    return gray
+@app.route('/display_image', methods=['GET', 'POST'])
+def display_image():
+    global uploaded_image_data
+    if request.method == 'POST' and 'image' in request.files:
+        image = request.files['image']
+        # Read the image data from the FileStorage object and store it
+        uploaded_image_data = image.read()
+        encoded_image = base64.b64encode(uploaded_image_data).decode('utf-8')
+        uploaded_image = f"data:image/png;base64,{encoded_image}"
+    else:
+        uploaded_image = None
+    return render_template('EditImage.html', uploaded_image=uploaded_image)
 
 @app.route('/ConertToGray', methods=['POST'])
 def ConertToGray():
-    if 'image' in request.files:
-        image = request.files['image']
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
         gray = FromBGR_To_Gray(image)
-
-        # Convert the grayscale image to a PNG byte array
-        img_buffer = cv.imencode('.png', gray)[1].tobytes()
+        _, img_buffer = cv.imencode('.png', gray)
+        image_download = img_buffer
         img_str = base64.b64encode(img_buffer).decode('utf-8')
-
         return render_template('EditImage.html', gray_image=img_str)
+    return "Error"
 
-    return render_template('EditImage.html')
+image_download = None
+
+@app.route('/download_image', methods=['GET'])
+def download_image():
+    global image_download
+    if image_download is not None:
+        # Create a file-like object and serve it as a downloadable file
+        img_io = io.BytesIO(image_download)
+        img_io.seek(0)
+        return send_file(img_io, as_attachment=True, download_name='image.png', mimetype='image/png')
+    return "Not Found"
+
+
+
+
+@app.route('/ConvertToLap', methods=['POST'])
+def ConvertToLap():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        lap = FromGray_To_Lap(image)
+        _, img_buffer = cv.imencode('.png', lap)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', lap_image=img_str)
+    return "Error"
+
+
+
+@app.route('/ConvertToCanny', methods=['POST'])
+def ConvertToCanny():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        canny = FromGray_To_Canny(image)
+        _, img_buffer = cv.imencode('.png', canny)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', canny_image=img_str)
+    return "Error"
+
+
+@app.route('/ConvertToRed', methods=['POST'])
+def ConvertToCaConvertToRednny():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        red = FromImage_To_Red(image)
+        _, img_buffer = cv.imencode('.png', red)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', red_image=img_str)
+    return "Error"
+
+@app.route('/ConvertToBlue', methods=['POST'])
+def ConvertToBlue():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        blue = FromImage_To_Blue(image)
+        _, img_buffer = cv.imencode('.png', blue)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', blue_image=img_str)
+    return "Error"
+
+
+@app.route('/ConvertToGreen', methods=['POST'])
+def ConvertToGreen():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        green = FromImage_To_Green(image)
+        _, img_buffer = cv.imencode('.png', green)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', green_image=img_str)
+    return "Error"
+
+
+
+@app.route('/DetectFaces', methods=['POST'])
+def DetectFaces():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        detect = Detect_Faces(image)
+        _, img_buffer = cv.imencode('.png', detect)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', detect_image=img_str)
+    return "Error"
+
+
+
+
 
 
 
