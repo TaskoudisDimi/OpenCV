@@ -45,9 +45,9 @@ while(cv.waitKey(1) & 0xFF != ord('q')):
     _, img = camera.read()
     grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     faces = face_classifier.detectMultiScale(grey, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50))
+    print(faces)
     for (x, y, w, h) in faces:
         cv.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
         face_region = grey[y:y + h, x:x + w]
         if cv.waitKey(1) & 0xFF == ord('s') and np.average(face_region) > 50:
             face_img = cv.resize(face_region, (220, 220))

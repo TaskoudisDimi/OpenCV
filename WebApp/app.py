@@ -149,7 +149,7 @@ def ConvertToGreen():
 
 
 
-@app.route('/DetectFaces', methods=['POST'])
+@app.route('/Detect_Faces', methods=['POST'])
 def DetectFaces():
     global uploaded_image_data
     global image_download
@@ -192,7 +192,9 @@ def GetFingers():
 
 
 
-
+@app.route('/FingerCounting', methods=['GET'])
+def Scanner():
+    return render_template('FingerCounting.html')
 
 @app.route('/FaceRecognition', methods=['GET'])
 def FaceRecognition():

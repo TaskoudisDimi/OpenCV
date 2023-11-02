@@ -15,15 +15,15 @@
     <form action="/display_image" method="post" enctype="multipart/form-data">
         <input type="file" name="image" accept="image/*">
         <button type="submit" class="btn btn-primary">
-            Upload Image
+            Display Image
         </button>
     </form> 
     
     {% if uploaded_image %}
-        <h4>Uploaded Image</h4>
-        <img src="{{ uploaded_image }}" alt="Uploaded Image">
+        <img src="{{ uploaded_image }}" alt="Display Image">
     {% endif %}
 
+    
     <!-- Gray -->
     <form action="/ConertToGray" method="post" enctype="multipart/form-data">
         <button type="submit" class="btn btn-primary">
