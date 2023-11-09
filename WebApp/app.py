@@ -165,6 +165,19 @@ def DetectFaces():
 
 
 
+@app.route('/Resize_Image', methods=['POST'])
+def ResizeImage():
+    global uploaded_image_data
+    global image_download
+    if uploaded_image_data is not None:
+        # Convert the uploaded image data to an OpenCV-compatible format
+        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+        detect = Detect_Faces(image)
+        _, img_buffer = cv.imencode('.png', detect)
+        image_download = img_buffer
+        img_str = base64.b64encode(img_buffer).decode('utf-8')
+        return render_template('EditImage.html', detect_image=img_str)
+    return "Error"
 
 
 
@@ -184,17 +197,10 @@ def FingerCounting():
 
 @app.route('/GetFingers', methods=['GET'])
 def GetFingers():
-    return render_template('FingerCounting.html')
+    return render_template('GetFingers.html')
 
 
 
-
-
-
-
-@app.route('/FingerCounting', methods=['GET'])
-def Scanner():
-    return render_template('FingerCounting.html')
 
 @app.route('/FaceRecognition', methods=['GET'])
 def FaceRecognition():

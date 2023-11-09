@@ -2,7 +2,20 @@ import cv2 as cv
 import numpy as np
 
 
-img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Resources/Photos/cat.jpg')
+
+
+
+
+img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
+
+print(img.shape)
+
+
+cv.imshow("Image", img)
+
+
+
+
 
 
 # # Converting to grayscale

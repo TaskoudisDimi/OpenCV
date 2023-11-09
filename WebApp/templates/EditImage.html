@@ -105,7 +105,16 @@
     {% endif %}
 
 
+    <!-- Resize Image -->
+    <form action="/Detect_Faces" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">
+            Detect Faces
+        </button>
+    </form> 
 
+    {% if detect_image %}
+        <img src="data:image/png;base64, {{ detect_image }}" alt="Cany Image">
+    {% endif %}
 
 
     <a href="{{ url_for('download_image') }}" download="image.png" class="btn btn-primary">Download Image</a>
