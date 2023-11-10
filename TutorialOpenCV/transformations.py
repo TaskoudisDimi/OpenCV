@@ -7,6 +7,7 @@ img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Tutoria
 def translate(image, x, y):
     transMat = np.float32([[1, 0, x], [0, 1, y]])
     dimensions = (image.shape[1], image.shape[0])
+    # warpAffine() function is the size of the output image, which should be in the form of **(width, height)**. Remember width = number of columns, and height = number of rows.
     return cv.warpAffine(image, transMat, dimensions)
 
 # -x --> Left
