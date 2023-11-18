@@ -1,6 +1,7 @@
 
 import numpy as np
 import cv2 as cv
+from openpyxl import Workbook
 
 
 def FromBGR_To_Gray(img):
@@ -56,4 +57,13 @@ def Detect_Faces(img):
 
 
 
+def From_Image_to_Text():
+    pass
 
+
+def Resize_Image():
+    pass
+
+
+def Segmentation_Image():
+    pass

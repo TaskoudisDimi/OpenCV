@@ -14,7 +14,7 @@ img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/Compute
 
 custom_config = r'--oem 3 --psm 6'
 text = pytesseract.image_to_string(img, config=custom_config)
-print(text)
+# print(text)
 
 # # make a copy of this image to draw in
 # image_copy = img.copy()
