@@ -2,7 +2,10 @@ import numpy as np
 import cv2 as cv
 
 
-img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/coins.jpg')
+# img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/coins.jpg')
+
+img = cv.imread('D:/Programming/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
+
 
 
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -10,7 +13,6 @@ gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 #Thresholding: Applies thresholding to the grayscale image using Otsu's thresholding method to obtain a binary image. This process separates objects from the background.
 ret, threshold = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
 # cv.imshow('opening', threshold)
-
 
 kernel = np.ones([3,3], np.uint8)
 #Morphological Operations: Performs morphological opening to remove noise and smoothen the binary image.

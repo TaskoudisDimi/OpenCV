@@ -162,8 +162,6 @@ def ConvertToGreen():
     return "Error"
 
 
-
-
 @app.route('/Detect_Faces', methods=['POST'])
 def DetectFaces():
     global uploaded_image_data
@@ -187,27 +185,30 @@ def ResizeImage():
     if uploaded_image_data is not None:
         # Convert the uploaded image data to an OpenCV-compatible format
         image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
-        ResizedImage = Resize_Image(image)
-        _, img_buffer = cv.imencode('.png', ResizedImage)
+        width = int(request.form['width'])  # Get width value from the form
+        height = int(request.form['height'])  # Get height value from the form
+
+        image = Resize_Image(image, width, height)
+        _, img_buffer = cv.imencode('.png', image)
         image_download = img_buffer
         img_str = base64.b64encode(img_buffer).decode('utf-8')
-        return render_template('EditImage.html', ResizedImage=img_str)
+        return render_template('EditImage.html', detect_image=img_str)
     return "Error"
 
 
-@app.route('/From_Image_to_Text', methods=['POST'])
-def FromImagetoText():
-    global uploaded_image_data
-    global image_download
-    if uploaded_image_data is not None:
-        # Convert the uploaded image data to an OpenCV-compatible format
-        image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
-        Image_to_Text = From_Image_to_Text(image)
-        _, img_buffer = cv.imencode('.png', Image_to_Text)
-        image_download = img_buffer
-        img_str = base64.b64encode(img_buffer).decode('utf-8')
-        return render_template('EditImage.html', From_Image_to_Text=img_str)
-    return "Error"
+# @app.route('/From_Image_to_Text', methods=['POST'])
+# def FromImagetoText():
+#     global uploaded_image_data
+#     global image_download
+#     if uploaded_image_data is not None:
+#         # Convert the uploaded image data to an OpenCV-compatible format
+#         image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+#         Image_to_Text = From_Image_to_Text(image)
+#         _, img_buffer = cv.imencode('.png', Image_to_Text)
+#         image_download = img_buffer
+#         img_str = base64.b64encode(img_buffer).decode('utf-8')
+#         return render_template('EditImage.html', From_Image_to_Text=img_str)
+#     return "Error"
 
 
 @app.route('/Segmentation_Image', methods=['POST'])
@@ -234,6 +235,17 @@ def EditVideo():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/FingerCounting', methods=['GET'])
 def FingerCounting():
     return render_template('FingerCounting.html')
@@ -242,8 +254,6 @@ def FingerCounting():
 @app.route('/GetFingers', methods=['GET'])
 def GetFingers():
     return render_template('GetFingers.html')
-
-
 
 
 @app.route('/FaceRecognition', methods=['GET'])
@@ -275,6 +285,7 @@ def process_video():
 
 
 if __name__ == '__main__':
-    app.run(debug='True')
+    # app.run(debug='True')
+    app.run()
 
 

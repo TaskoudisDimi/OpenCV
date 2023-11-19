@@ -105,7 +105,7 @@
     {% endif %}
 
     <!-- From Image to Text -->
-    <form action="/From_Image_to_Text" method="post" enctype="multipart/form-data">
+    <!-- <form action="/From_Image_to_Text" method="post" enctype="multipart/form-data">
         <button type="submit" class="btn btn-primary">
             From Image to Text
         </button>
@@ -113,7 +113,7 @@
 
     {% if From_Image_to_Text %}
         <img src="data:image/png;base64, {{ From_Image_to_Text }}" alt="Cany Image">
-    {% endif %}
+    {% endif %} -->
     
 
     <!-- Resize Image -->
@@ -121,6 +121,13 @@
         <button type="submit" class="btn btn-primary">
             Resize Image
         </button>
+        <label for="width">Width:</label>
+        <input type="number" id="width" name="width" required><br><br>
+
+        <label for="height">Height:</label>
+        <input type="number" id="height" name="height" required><br><br>
+
+        <input type="submit" value="Resize Image">
     </form> 
 
     {% if Resize_Image %}

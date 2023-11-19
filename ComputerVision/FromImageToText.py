@@ -12,6 +12,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tessera
 
 img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Images/test.png')
 
+# img = cv.imread('D:/Programming/OpenCV/OpenCV/ComputerVision/Images/test.png')
+
 custom_config = r'--oem 3 --psm 6'
 text = pytesseract.image_to_string(img, config=custom_config)
 # print(text)
