@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, jsonify, render_template, request, send_file
 import base64
 import io
 import numpy as np
 import cv2 as cv
 from Utils import FromBGR_To_Gray, FromGray_To_Lap, FromGray_To_Canny, FromImage_To_Blue, FromImage_To_Green, FromImage_To_Red, Detect_Faces, From_Image_to_Text, Resize_Image, Segmentation_Image
-
+from Utils import poseEstimation
 
 # TODO: Android
 
@@ -16,13 +16,13 @@ image_download = None
 
 
 #######
-# 1) Congert To Gray 
-# 2) Segmetation and replace (Adaptive Thresholding, Laplacian, Canny)
-# 3) Adaptive threshold
-# 4) Resize 
-# 5) Gym tracker
-# 6) Realtime Face Recognizer
-# 7) Mouse control, Volume control
+# 1) Adaptive threshold
+# 2) Gym tracker
+# 3) Realtime Face Recognizer
+# 4) Mouse control, Volume control
+# 5) Scanner
+# 6) Face Recognition
+# 7) Edit Video (Pose Estimation, Finger Counting)
 
 
 @app.route('/', methods=['GET'])
@@ -196,21 +196,6 @@ def ResizeImage():
     return "Error"
 
 
-# @app.route('/From_Image_to_Text', methods=['POST'])
-# def FromImagetoText():
-#     global uploaded_image_data
-#     global image_download
-#     if uploaded_image_data is not None:
-#         # Convert the uploaded image data to an OpenCV-compatible format
-#         image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
-#         Image_to_Text = From_Image_to_Text(image)
-#         _, img_buffer = cv.imencode('.png', Image_to_Text)
-#         image_download = img_buffer
-#         img_str = base64.b64encode(img_buffer).decode('utf-8')
-#         return render_template('EditImage.html', From_Image_to_Text=img_str)
-#     return "Error"
-
-
 @app.route('/Segmentation_Image', methods=['POST'])
 def SegmentationImage():
     global uploaded_image_data
@@ -226,6 +211,22 @@ def SegmentationImage():
     return "Error"
 
 
+# @app.route('/From_Image_to_Text', methods=['POST'])
+# def FromImagetoText():
+#     global uploaded_image_data
+#     global image_download
+#     if uploaded_image_data is not None:
+#         # Convert the uploaded image data to an OpenCV-compatible format
+#         image = cv.imdecode(np.frombuffer(uploaded_image_data, np.uint8), cv.IMREAD_COLOR)
+#         Image_to_Text = From_Image_to_Text(image)
+#         _, img_buffer = cv.imencode('.png', Image_to_Text)
+#         image_download = img_buffer
+#         img_str = base64.b64encode(img_buffer).decode('utf-8')
+#         return render_template('EditImage.html', From_Image_to_Text=img_str)
+#     return "Error"
+
+
+
 
 
 
@@ -234,9 +235,13 @@ def EditVideo():
     return render_template('EditVideo.html')
 
 
-
-
-
+# @app.route("/process_video", methods=["POST"])
+# def process_video():
+#     file = request.files["video"]
+#     file_path = "static/uploaded_video.mp4"
+#     file.save(file_path)
+#     poseEstimation(file_path)
+#     return jsonify({"message": "Pose estimation completed"})  # Return a response
 
 
 
@@ -274,18 +279,9 @@ def Scanner():
 
 
 
-@app.route("/process_video", methods=["POST"])
-def process_video():
-    file = request.files["video"]
-    # Add your video processing code here
-    # For example, you can save the video to a specific location
-    # file.save("uploaded_video.mp4")
-    return render_template('Home.html')
-
-
 
 if __name__ == '__main__':
-    # app.run(debug='True')
+    app.run(debug='True')
     app.run()
 
 

@@ -2,9 +2,9 @@ import numpy as np
 import cv2 as cv
 
 
-# img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/coins.jpg')
+img = cv.imread('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
 
-img = cv.imread('D:/Programming/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
+# img = cv.imread('D:/Programming/OpenCV/OpenCV/TutorialOpenCV/Resources/Photos/cat.jpg')
 
 
 

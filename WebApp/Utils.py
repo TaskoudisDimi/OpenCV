@@ -64,8 +64,22 @@ def Resize_Image(img, width, height):
 
 
 
-def Segmentation_Image():
-    pass
+def Segmentation_Image(img):
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    ret, threshold = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
+    kernel = np.ones([3,3], np.uint8)
+    opening = cv.morphologyEx(threshold, cv.MORPH_OPEN, kernel, iterations=2)
+    sure_bg = cv.dilate(opening, kernel, iterations=3)
+    dist_transform = cv.distanceTransform(opening, cv.DIST_L2, 5)
+    ret, sure_fg = cv.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+    sure_fg = np.uint8(sure_fg)
+    unknown = cv.subtract(sure_bg,sure_fg)
+    ret, markers = cv.connectedComponents(sure_fg)
+    markers = markers+1
+    markers[unknown==255] = 0
+    markers = cv.watershed(img,markers)
+    img[markers == -1] = [0,0,255]
+    return img
 
 
 
@@ -114,20 +128,27 @@ class poseDetector():
         return lmList
     
 
-# detector = estimator.poseDetector()
 
-# while True:
-#     success,img = video.read()
-#     croped = img[500:1500, 500:1000, :]
-#     croped = detector.findPose(croped)
-#     lmList = detector.findPosition(croped, draw=False)
-#     if len(lmList)!=0:
-#         cv.circle(croped, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv.FILLED)
-#     cTime = time.time()
-#     fps = 5 /(cTime-pTime)
-#     pTime = cTime
+mpPose = mp.solutions.pose
+pose = mpPose.Pose()
+mpDraw = mp.solutions.drawing_utils
 
-#     cv.putText(croped, str(int(fps)), (70,50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0 , 0), 3)
 
-#     cv.imshow('Video', croped)
-#     cv.waitKey(1)
+def poseEstimation(video):
+    success, img = video.read()
+    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    results = pose.process(img)
+    if results.pose_landmarks:
+        mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+        for id, lm in enumerate(results.pose_landmakrs.landmark):
+            h, w, c = img.shape
+            print(id, lm)
+            cx, cy = int(lm.x * w), int(lm.y * h)
+            cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
+    return img
+
+
+
+
+
+

@@ -1,107 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Camera and Video Upload</title>
+  <title>Video Pose Estimation</title>
   <script src="/WebApp/js/script.js" defer></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
 </head>
 <body>
-  <h1>Camera and Video Upload</h1>
+  <h1>Video Pose Estimation</h1>
+
   <div>
     <button id="cameraButton">Open Camera</button>
     <input type="file" id="videoInput" accept="video/mp4" />
   </div>
+
   <div id="videoContainer">
     <video id="videoPlayer" controls autoplay></video>
   </div>
 
+  <!-- Pose Estimation -->
+  <form id="poseEstimationForm" action="/process_video" method="post" enctype="multipart/form-data">
+    <button type="submit" class="btn btn-primary" id="poseEstimationButton">
+      Pose Estimation
+    </button>
+  </form>
 
-<!-- Pose Estimation -->
-<form action="/Pose_Estimation" method="post" enctype="multipart/form-data">
-  <button type="submit" class="btn btn-primary">
-    Pose Estimation
-  </button>
-</form> 
+  <!-- Display Pose Estimation Results -->
+  <div id="poseEstimationResults">
+    <!-- Display processed video frames or annotated frames -->
+    <!-- Add a video or image element here to display the results -->
+  </div>
 
-
-
-
-
-
-
-
-
-
-
-  <form action="/" method="get"><button type="submit" class="btn btn-primary">Back</button></form>
+  <form action="/" method="get">
+    <button type="submit" class="btn btn-primary">Back</button>
+  </form>
 
   <!-- Add Bootstrap and jQuery JS links -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
-
-<script>
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
-  const cameraButton = document.getElementById("cameraButton");
-  const videoInput = document.getElementById("videoInput");
-  const videoPlayer = document.getElementById("videoPlayer");
+      const videoInput = document.getElementById("videoInput");
+      const videoPlayer = document.getElementById("videoPlayer");
+      const poseEstimationForm = document.getElementById("poseEstimationForm");
+      const poseEstimationButton = document.getElementById("poseEstimationButton");
+      const poseEstimationResults = document.getElementById("poseEstimationResults");
 
-  cameraButton.addEventListener("click", () => {
-    openCamera();
-  });
-
-  videoInput.addEventListener("change", () => {
-    loadVideo();
-  });
-
-  function openCamera() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert("Camera not supported in this browser.");
-      return;
-    }
-
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        videoPlayer.srcObject = stream;
-      })
-      .catch(error => {
-        console.error("Error accessing camera: ", error);
+      videoInput.addEventListener("change", () => {
+        loadVideo();
       });
-  }
 
-  function loadVideo() {
-    const file = videoInput.files[0];
-    if (file) {
-      const videoURL = URL.createObjectURL(file);
-      videoPlayer.src = videoURL;
-      
-      // Call the process_video endpoint
-      processVideo(file);
-    }
-  }
+      function loadVideo() {
+        const file = videoInput.files[0];
+        if (file) {
+          const videoURL = URL.createObjectURL(file);
+          videoPlayer.src = videoURL;
+        }
+      }
 
-  function processVideo(videoFile) {
-    const formData = new FormData();
-    formData.append("video", videoFile);
-
-    fetch("/process_video", {
-      method: "POST",
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data.message); // Print the response message from the server
-      })
-      .catch(error => {
-        console.error("Error while processing video: ", error);
+      poseEstimationForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const file = videoInput.files[0];
+        if (file) {
+          processVideo(file);
+        }
       });
-  }
-});
 
-</script>
+      function processVideo(videoFile) {
+        const formData = new FormData();
+        formData.append("video", videoFile);
+
+        fetch("/process_video", {
+          method: "POST",
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.message); // Print the response message from the server
+
+            // Display pose estimation results in poseEstimationResults div
+            // You'll need to update this part to display the processed frames
+            poseEstimationResults.innerHTML = '<p>Pose estimation results will be displayed here</p>';
+          })
+          .catch(error => {
+            console.error("Error while processing video: ", error);
+          });
+      }
+    });
+  </script>
 </body>
-
 </html>
