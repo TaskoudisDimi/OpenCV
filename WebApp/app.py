@@ -4,9 +4,6 @@ import io
 import numpy as np
 import cv2 as cv
 from Utils import FromBGR_To_Gray, FromGray_To_Lap, FromGray_To_Canny, FromImage_To_Blue, FromImage_To_Green, FromImage_To_Red, Detect_Faces, From_Image_to_Text, Resize_Image, Segmentation_Image
-from Utils import poseEstimation
-
-# TODO: Android
 
 app = Flask(__name__)
 
