@@ -13,13 +13,11 @@ image_download = None
 
 
 #######
-# 1) Adaptive threshold
-# 2) Gym tracker
-# 3) Realtime Face Recognizer
-# 4) Mouse control, Volume control
-# 5) Scanner
-# 6) Face Recognition
-# 7) Edit Video (Pose Estimation, Finger Counting)
+# 1) Gym tracker
+# 2) Realtime Face Recognizer
+# 3) Mouse control, Volume control
+# 4) Scanner
+# 5) Edit Video (Pose Estimation, Finger Counting)
 
 
 @app.route('/', methods=['GET'])
@@ -224,29 +222,27 @@ def SegmentationImage():
 
 
 
-
-
-
 @app.route('/EditVideo', methods=['GET'])
 def EditVideo():
     return render_template('EditVideo.html')
 
+
+# detector = estimator.poseDetector()
 
 # @app.route("/process_video", methods=["POST"])
 # def process_video():
 #     file = request.files["video"]
 #     file_path = "static/uploaded_video.mp4"
 #     file.save(file_path)
-#     poseEstimation(file_path)
+#     file_path = detector.findPose(file_path)
+#     lmList = detector.findPosition(file_path, draw=False)
+#     if len(lmList)!=0:
+#         cv.circle(file_path, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv.FILLED)
 #     return jsonify({"message": "Pose estimation completed"})  # Return a response
 
 
 
-
-
-
-
-
+# detector = handDetector()
 
 @app.route('/FingerCounting', methods=['GET'])
 def FingerCounting():
@@ -270,15 +266,33 @@ def MouseControl():
 def GymTracker():
     return render_template('GymTracker.html')
 
+
+### Scanner
 @app.route('/Scanner', methods=['GET'])
 def Scanner():
     return render_template('Scanner.html')
 
+uploaded_image_data_scanner = None
+@app.route('/display_image_scanner', methods=['GET', 'POST'])
+def display_image_scanner():
+    global uploaded_image_data_scanner
+    if request.method == 'POST' and 'image' in request.files:
+        image = request.files['image']
+        # Read the image data from the FileStorage object and store it
+        uploaded_image_data_scanner = image.read()
+        # it reads the image data, encodes it using Base64, and constructs a data URI for the uploaded image
+        encoded_image = base64.b64encode(uploaded_image_data_scanner).decode('utf-8')
+        uploaded_image = f"data:image/png;base64,{encoded_image}"
+    else:
+        uploaded_image = None
+    return render_template('Scanner.html', uploaded_image=uploaded_image)
 
+
+# scan = Scanner()
 
 
 if __name__ == '__main__':
-    app.run(debug='True')
-    app.run()
+    with app.app_context():
+        app.run(debug=True)
 
 

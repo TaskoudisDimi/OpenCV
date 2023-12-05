@@ -3,6 +3,7 @@ import numpy as np
 import cv2 as cv
 import mediapipe as mp 
 import time
+import math
 # from openpyxl import Workbook
 
 
@@ -88,6 +89,77 @@ def From_Image_to_Text():
 
 
 
+widthImg = 480
+heightImg = 640
+
+# class Scanner():
+#     def __init__(self):
+#         cv.namedWindow("Trackbars")
+#         cv.resizeWindow("Trackbars", 360, 120)
+#         cv.createTrackbar("Threshold1", "Trackbars", 10,255, self.nothing)
+#         cv.createTrackbar("Threshold2", "Trackbars", 50, 255, self.nothing)
+
+#     # finds the edges of the image
+#     def getContours(self, img):
+#         biggest = np.array([])
+#         maxArea = 0
+#         contours, hierarchy = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+#         for cnt in contours:
+#             area = cv.contourArea(cnt)
+#             if area>5000:
+#                 peri = cv.arcLength(cnt, True)
+#                 approx = cv.approxPolyDP(cnt, 0.02*peri, True)
+#                 if area>maxArea and len(approx) == 4:
+#                     biggest = approx
+#                     maxArea = area
+#         return biggest
+
+#     # the image is preprocessed by applying different filters, to find the edges and the text
+#     def preProcessing(self, img):
+#         imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY) # turning into gray scale image
+#         imgBlur = cv.GaussianBlur(imgGray, (5,5), 1) # adding gausian blur
+#         thres = self.valTrackbars() # getting track bar values
+#         imgCanny = cv.Canny(imgBlur, thres[0], thres[1]) # canny blur
+#         kernel = np.ones((5,5))
+#         imgDial = cv.dilate(imgCanny, kernel, iterations=1) # applying dilation
+#         imgErode = cv.erode(imgDial, kernel, iterations=1) # applying erosion
+#         return imgErode
+
+#     # calculates the four courner points of the image
+#     def reorder(self, myPoints):
+#         myPoints = myPoints.reshape((4,2))
+#         myPointsNew = np.zeros((4, 1, 2), np.int32)
+#         add = myPoints.sum(1)
+#         myPointsNew[0] = myPoints[np.argmin(add)]
+#         myPointsNew[3] = myPoints[np.argmax(add)]
+#         diff = np.diff(myPoints, axis=1)
+#         myPointsNew[1] = myPoints[np.argmin(diff)]
+#         myPointsNew[2] = myPoints[np.argmax(diff)]
+#         return myPointsNew
+
+#     # the image is cropped at the edges, with the obtained four points(co-ordinates)
+#     def getWarp(self, img, biggest):
+#         biggest = self.reorder(biggest)
+#         pts1 = np.float32(biggest)
+#         pts2 = np.float32([[0,0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])
+#         matrix = cv.getPerspectiveTransform(pts1, pts2)
+#         imgOutput = cv.warpPerspective(img, matrix, (widthImg, heightImg))
+#         imgOutput = imgOutput[5:img.shape[0]-5, 5:img.shape[1]-5]
+#         imgOutput = cv.resize(imgOutput, (480, 640))
+#         return imgOutput
+
+#     def nothing(x):
+#         pass
+    
+        
+#     # adjust the threshold values to get the desired scan
+#     def valTrackbars(self):
+#         Threshold1 = cv.getTrackbarPos("Threshold1", "Trackbars")
+#         Threshold2 = cv.getTrackbarPos("Threshold2", "Trackbars")
+#         src = Threshold1,Threshold2
+#         return src
+    
+
 # class poseDetector():
 #     def __init__(self, mode=False, upBody=False, smooth=True, detectionCon=0.5, trackCon=0.5):
 #         self.mode = mode
@@ -126,26 +198,92 @@ def From_Image_to_Text():
 #                 if draw:
 #                     cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
 #         return lmList
-    
 
 
-# mpPose = mp.solutions.pose
-# pose = mpPose.Pose()
-# mpDraw = mp.solutions.drawing_utils
+class handDetector():
+    def __init__(self, mode=False, maxHands=2, detectionCon=False, trackCon=0.5):
+        self.mode = mode
+        self.maxHands = maxHands
+        self.detectionCon = detectionCon
+        self.trackCon = trackCon
 
+        self.mpHands = mp.solutions.hands
+        self.hands = self.mpHands.Hands(self.mode, self.maxHands,
+                                        self.detectionCon, self.trackCon)
+        self.mpDraw = mp.solutions.drawing_utils
+        self.tipIds = [4, 8, 12, 16, 20]
 
-# def poseEstimation(video):
-#     success, img = video.read()
-#     img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-#     results = pose.process(img)
-#     if results.pose_landmarks:
-#         mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
-#         for id, lm in enumerate(results.pose_landmakrs.landmark):
-#             h, w, c = img.shape
-#             print(id, lm)
-#             cx, cy = int(lm.x * w), int(lm.y * h)
-#             cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
-#     return img
+    def findHands(self, img, draw=True):    # Finds all hands in a frame
+        imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        self.results = self.hands.process(imgRGB)
+
+        if self.results.multi_hand_landmarks:
+            for handLms in self.results.multi_hand_landmarks:
+                if draw:
+                    self.mpDraw.draw_landmarks(img, handLms,
+                                               self.mpHands.HAND_CONNECTIONS)
+
+        return img
+
+    def findPosition(self, img, handNo=0, draw=True):   # Fetches the position of hands
+        xList = []
+        yList = []
+        bbox = []
+        self.lmList = []
+        if self.results.multi_hand_landmarks:
+            myHand = self.results.multi_hand_landmarks[handNo]
+            for id, lm in enumerate(myHand.landmark):
+                h, w, c = img.shape
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                xList.append(cx)
+                yList.append(cy)
+                self.lmList.append([id, cx, cy])
+                if draw:
+                    cv.circle(img, (cx, cy), 5, (255, 0, 255), cv.FILLED)
+
+            xmin, xmax = min(xList), max(xList)
+            ymin, ymax = min(yList), max(yList)
+            bbox = xmin, ymin, xmax, ymax
+
+            if draw:
+                cv.rectangle(img, (xmin - 20, ymin - 20), (xmax + 20, ymax + 20),
+                              (0, 255, 0), 2)
+
+        return self.lmList, bbox
+
+    def fingersUp(self):    # Checks which fingers are up
+        fingers = []
+        # Thumb
+        if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
+            fingers.append(1)
+        else:
+            fingers.append(0)
+
+        # Fingers
+        for id in range(1, 5):
+
+            if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+
+        # totalFingers = fingers.count(1)
+
+        return fingers
+
+    def findDistance(self, p1, p2, img, draw=True,r=15, t=3):   # Finds distance between two fingers
+        x1, y1 = self.lmList[p1][1:]
+        x2, y2 = self.lmList[p2][1:]
+        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+
+        if draw:
+            cv.line(img, (x1, y1), (x2, y2), (255, 0, 255), t)
+            cv.circle(img, (x1, y1), r, (255, 0, 255), cv.FILLED)
+            cv.circle(img, (x2, y2), r, (255, 0, 255), cv.FILLED)
+            cv.circle(img, (cx, cy), r, (0, 0, 255), cv.FILLED)
+        length = math.hypot(x2 - x1, y2 - y1)
+
+        return length, img, [x1, y1, x2, y2, cx, cy]
 
 
 

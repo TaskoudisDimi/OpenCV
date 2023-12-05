@@ -13,7 +13,21 @@
 
     <div>
         <button id="cameraButton">Open Camera</button>
+        <input type="file" id="videoInput" accept="video/mp4">
     </div>
+    <div id="videoContainer">
+        <video id="videoPlayer" controls autoplay></video>
+    </div>
+
+    <form action="/display_image_scanner" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit" class="btn btn-primary">Display Image</button>
+    </form>
+
+    {% if uploaded_image %}
+        <img src="{{ uploaded_image }}" alt="Display Image">
+    {% endif %}
+
 
 
     <form action="/" method="get"><button type="submit" class="btn btn-primary">Back</button></form>
@@ -21,6 +35,20 @@
     <!-- Add Bootstrap and jQuery JS links -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+    <script>
+        const videoInput = document.getElementById("videoInput");
+            const videoPlayer = document.getElementById("videoPlayer");
+            videoInput.addEventListener("change", ()=>{
+                loadvideo();
+            });
+            function loadvideo(){
+                const file = videoInput.files[0];
+                if (file){
+                    const videoURL = URL.createObjectURL(file);
+                    videoPlayer.src = videoURL;
+                }
+            }
+
+    </script>
 </body>
 </html>
