@@ -92,72 +92,67 @@ def From_Image_to_Text():
 widthImg = 480
 heightImg = 640
 
-# class Scanner():
-#     def __init__(self):
-#         cv.namedWindow("Trackbars")
-#         cv.resizeWindow("Trackbars", 360, 120)
-#         cv.createTrackbar("Threshold1", "Trackbars", 10,255, self.nothing)
-#         cv.createTrackbar("Threshold2", "Trackbars", 50, 255, self.nothing)
+class UtilScanner():
+    def __init__(self):
+        pass
+        # cv.namedWindow("Trackbars")
+        # cv.resizeWindow("Trackbars", 360, 120)
+        # cv.createTrackbar("Threshold1", "Trackbars", 10,255, self.nothing)
+        # cv.createTrackbar("Threshold2", "Trackbars", 50, 255, self.nothing)
 
-#     # finds the edges of the image
-#     def getContours(self, img):
-#         biggest = np.array([])
-#         maxArea = 0
-#         contours, hierarchy = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-#         for cnt in contours:
-#             area = cv.contourArea(cnt)
-#             if area>5000:
-#                 peri = cv.arcLength(cnt, True)
-#                 approx = cv.approxPolyDP(cnt, 0.02*peri, True)
-#                 if area>maxArea and len(approx) == 4:
-#                     biggest = approx
-#                     maxArea = area
-#         return biggest
+    # finds the edges of the image
+    def getContours(self, img):
+        biggest = np.array([])
+        maxArea = 0
+        contours, hierarchy = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+        for cnt in contours:
+            area = cv.contourArea(cnt)
+            if area>5000:
+                peri = cv.arcLength(cnt, True)
+                approx = cv.approxPolyDP(cnt, 0.02*peri, True)
+                if area>maxArea and len(approx) == 4:
+                    biggest = approx
+                    maxArea = area
+        return biggest
 
-#     # the image is preprocessed by applying different filters, to find the edges and the text
-#     def preProcessing(self, img):
-#         imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY) # turning into gray scale image
-#         imgBlur = cv.GaussianBlur(imgGray, (5,5), 1) # adding gausian blur
-#         thres = self.valTrackbars() # getting track bar values
-#         imgCanny = cv.Canny(imgBlur, thres[0], thres[1]) # canny blur
-#         kernel = np.ones((5,5))
-#         imgDial = cv.dilate(imgCanny, kernel, iterations=1) # applying dilation
-#         imgErode = cv.erode(imgDial, kernel, iterations=1) # applying erosion
-#         return imgErode
+    # the image is preprocessed by applying different filters, to find the edges and the text
+    def preProcessing(self, img):
+        imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY) # turning into gray scale image
+        imgBlur = cv.GaussianBlur(imgGray, (5,5), 1) # adding gausian blur
 
-#     # calculates the four courner points of the image
-#     def reorder(self, myPoints):
-#         myPoints = myPoints.reshape((4,2))
-#         myPointsNew = np.zeros((4, 1, 2), np.int32)
-#         add = myPoints.sum(1)
-#         myPointsNew[0] = myPoints[np.argmin(add)]
-#         myPointsNew[3] = myPoints[np.argmax(add)]
-#         diff = np.diff(myPoints, axis=1)
-#         myPointsNew[1] = myPoints[np.argmin(diff)]
-#         myPointsNew[2] = myPoints[np.argmax(diff)]
-#         return myPointsNew
+        imgCanny = cv.Canny(imgBlur, 10, 50) # canny blur
+        kernel = np.ones((5,5))
+        imgDial = cv.dilate(imgCanny, kernel, iterations=1) # applying dilation
+        imgErode = cv.erode(imgDial, kernel, iterations=1) # applying erosion
+        return imgErode
 
-#     # the image is cropped at the edges, with the obtained four points(co-ordinates)
-#     def getWarp(self, img, biggest):
-#         biggest = self.reorder(biggest)
-#         pts1 = np.float32(biggest)
-#         pts2 = np.float32([[0,0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])
-#         matrix = cv.getPerspectiveTransform(pts1, pts2)
-#         imgOutput = cv.warpPerspective(img, matrix, (widthImg, heightImg))
-#         imgOutput = imgOutput[5:img.shape[0]-5, 5:img.shape[1]-5]
-#         imgOutput = cv.resize(imgOutput, (480, 640))
-#         return imgOutput
+    # calculates the four courner points of the image
+    def reorder(self, myPoints):
+        myPoints = myPoints.reshape((4,2))
+        myPointsNew = np.zeros((4, 1, 2), np.int32)
+        add = myPoints.sum(1)
+        myPointsNew[0] = myPoints[np.argmin(add)]
+        myPointsNew[3] = myPoints[np.argmax(add)]
+        diff = np.diff(myPoints, axis=1)
+        myPointsNew[1] = myPoints[np.argmin(diff)]
+        myPointsNew[2] = myPoints[np.argmax(diff)]
+        return myPointsNew
 
-#     def nothing(x):
-#         pass
-    
-        
-#     # adjust the threshold values to get the desired scan
-#     def valTrackbars(self):
-#         Threshold1 = cv.getTrackbarPos("Threshold1", "Trackbars")
-#         Threshold2 = cv.getTrackbarPos("Threshold2", "Trackbars")
-#         src = Threshold1,Threshold2
-#         return src
+    # the image is cropped at the edges, with the obtained four points(co-ordinates)
+    def getWarp(self, img, biggest):
+        biggest = self.reorder(biggest)
+        pts1 = np.float32(biggest)
+        pts2 = np.float32([[0,0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])
+        matrix = cv.getPerspectiveTransform(pts1, pts2)
+        imgOutput = cv.warpPerspective(img, matrix, (widthImg, heightImg))
+        imgOutput = imgOutput[5:img.shape[0]-5, 5:img.shape[1]-5]
+        imgOutput = cv.resize(imgOutput, (480, 640))
+        return imgOutput
+
+    def nothing(x):
+        pass
+
+
     
 
 # class poseDetector():

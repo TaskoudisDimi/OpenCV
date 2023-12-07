@@ -19,14 +19,28 @@
         <video id="videoPlayer" controls autoplay></video>
     </div>
 
-    <form action="/display_image_scanner" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*">
-        <button type="submit" class="btn btn-primary">Display Image</button>
-    </form>
 
+     <!-- Upload -->
+     <form action="/display_image_scanner" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit" class="btn btn-primary">
+            Display Image
+        </button>
+    </form> 
+    
     {% if uploaded_image %}
         <img src="{{ uploaded_image }}" alt="Display Image">
     {% endif %}
+
+    <form action="/scanned_image" method="post">
+        <button type="submit" class="btn btn-primary">Scanned</button>
+    </form>
+
+    {% if uploaded_image_scanned %}
+    <img src="data:image/png;base64,{{ uploaded_image_scanned }}" alt="Scanned Image">
+    {% endif %}
+
+
 
 
 
@@ -37,18 +51,17 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         const videoInput = document.getElementById("videoInput");
-            const videoPlayer = document.getElementById("videoPlayer");
-            videoInput.addEventListener("change", ()=>{
-                loadvideo();
-            });
-            function loadvideo(){
-                const file = videoInput.files[0];
-                if (file){
-                    const videoURL = URL.createObjectURL(file);
-                    videoPlayer.src = videoURL;
-                }
+        const videoPlayer = document.getElementById("videoPlayer");
+        videoInput.addEventListener("change", ()=>{
+            loadvideo();
+        });
+        function loadvideo(){
+            const file = videoInput.files[0];
+            if (file){
+                const videoURL = URL.createObjectURL(file);
+                videoPlayer.src = videoURL;
             }
-
+        }
     </script>
 </body>
 </html>

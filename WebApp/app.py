@@ -4,6 +4,7 @@ import io
 import numpy as np
 import cv2 as cv
 from Utils import FromBGR_To_Gray, FromGray_To_Lap, FromGray_To_Canny, FromImage_To_Blue, FromImage_To_Green, FromImage_To_Red, Detect_Faces, From_Image_to_Text, Resize_Image, Segmentation_Image
+from Utils import UtilScanner
 
 app = Flask(__name__)
 
@@ -288,7 +289,36 @@ def display_image_scanner():
     return render_template('Scanner.html', uploaded_image=uploaded_image)
 
 
-# scan = Scanner()
+scan = UtilScanner()
+
+@app.route('/scanned_image', methods=['POST'])
+def scanned_image():
+    if uploaded_image_data_scanner is not None:
+        img = cv.imdecode(np.frombuffer(uploaded_image_data_scanner, np.uint8), cv.IMREAD_COLOR)
+        img = cv.resize(img, (480, 640)) # resizing the image
+        imgProcessed = scan.preProcessing(img)
+        biggest = scan.getContours(imgProcessed)
+        if biggest.size != 0:
+            imgWarp = scan.getWarp(img, biggest)
+            print("Warp", len(imgWarp))
+            imgWarpGray = cv.cvtColor(imgWarp,cv.COLOR_BGR2GRAY)
+            imgAdaptiveThre = cv.adaptiveThreshold(imgWarpGray, 255, 1, 1, 7, 2)
+            imgResult = cv.bitwise_not(imgAdaptiveThre)
+            print("Result 1", len(imgResult))
+            _, img_buffer = cv.imencode('.png', imgResult)
+            result = base64.b64encode(img_buffer).decode('utf-8')
+            print("Result 2", len(result))  # Changed from print(result.size())
+        else:
+            imgResult = np.zeros((640, 480, 3), np.uint8)
+            print(imgResult.size)
+        return render_template('Scanner.html', uploaded_image_scanned=result if biggest.size != 0 else None)
+    # Ensure to handle cases when uploaded_image_data_scanner is None
+    return render_template('Scanner.html', uploaded_image=None)
+
+
+
+
+
 
 
 if __name__ == '__main__':
