@@ -5,6 +5,9 @@ import numpy as np
 import cv2 as cv
 from Utils import FromBGR_To_Gray, FromGray_To_Lap, FromGray_To_Canny, FromImage_To_Blue, FromImage_To_Green, FromImage_To_Red, Detect_Faces, From_Image_to_Text, Resize_Image, Segmentation_Image
 from Utils import UtilScanner
+import mediapipe as mp 
+from flask import send_file
+
 
 app = Flask(__name__)
 
@@ -46,8 +49,6 @@ def display_image():
         uploaded_image = None
     return render_template('EditImage.html', uploaded_image=uploaded_image)
 
-
-
 @app.route('/ConertToGray', methods=['POST'])
 def ConertToGray():
     global uploaded_image_data
@@ -64,9 +65,6 @@ def ConertToGray():
         return render_template('EditImage.html', gray_image=img_str)
     return "Error"
 
-
-
-
 @app.route('/download_image', methods=['GET'])
 def download_image():
     global image_download
@@ -76,9 +74,6 @@ def download_image():
         img_io.seek(0)
         return send_file(img_io, as_attachment=True, download_name='image.png', mimetype='image/png')
     return "Not Found"
-
-
-
 
 @app.route('/ConvertToLap', methods=['POST'])
 def ConvertToLap():
@@ -94,8 +89,6 @@ def ConvertToLap():
         return render_template('EditImage.html', lap_image=img_str)
     return "Error"
 
-
-
 @app.route('/ConvertToCanny', methods=['POST'])
 def ConvertToCanny():
     global uploaded_image_data
@@ -109,7 +102,6 @@ def ConvertToCanny():
         img_str = base64.b64encode(img_buffer).decode('utf-8')
         return render_template('EditImage.html', canny_image=img_str)
     return "Error"
-
 
 @app.route('/ConvertToRed', methods=['POST'])
 def ConvertToCaConvertToRednny():
@@ -125,8 +117,6 @@ def ConvertToCaConvertToRednny():
         return render_template('EditImage.html', red_image=img_str)
     return "Error"
 
-
-
 @app.route('/ConvertToBlue', methods=['POST'])
 def ConvertToBlue():
     global uploaded_image_data
@@ -140,8 +130,6 @@ def ConvertToBlue():
         img_str = base64.b64encode(img_buffer).decode('utf-8')
         return render_template('EditImage.html', blue_image=img_str)
     return "Error"
-
-
 
 @app.route('/ConvertToGreen', methods=['POST'])
 def ConvertToGreen():
@@ -157,7 +145,6 @@ def ConvertToGreen():
         return render_template('EditImage.html', green_image=img_str)
     return "Error"
 
-
 @app.route('/Detect_Faces', methods=['POST'])
 def DetectFaces():
     global uploaded_image_data
@@ -171,8 +158,6 @@ def DetectFaces():
         img_str = base64.b64encode(img_buffer).decode('utf-8')
         return render_template('EditImage.html', detect_image=img_str)
     return "Error"
-
-
 
 @app.route('/Resize_Image', methods=['POST'])
 def ResizeImage():
@@ -190,7 +175,6 @@ def ResizeImage():
         img_str = base64.b64encode(img_buffer).decode('utf-8')
         return render_template('EditImage.html', detect_image=img_str)
     return "Error"
-
 
 @app.route('/Segmentation_Image', methods=['POST'])
 def SegmentationImage():
@@ -223,23 +207,63 @@ def SegmentationImage():
 
 
 
+
+
+
 @app.route('/EditVideo', methods=['GET'])
 def EditVideo():
     return render_template('EditVideo.html')
 
 
-# detector = estimator.poseDetector()
+@app.route("/process_video", methods=["POST"])
+def process_video():
+    video_path = 'C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Gym.mp4'
+    cap = cv.VideoCapture(video_path)
+    detector = poseDetector()
+    frame_list = []  # To store processed frames
 
-# @app.route("/process_video", methods=["POST"])
-# def process_video():
-#     file = request.files["video"]
-#     file_path = "static/uploaded_video.mp4"
-#     file.save(file_path)
-#     file_path = detector.findPose(file_path)
-#     lmList = detector.findPosition(file_path, draw=False)
-#     if len(lmList)!=0:
-#         cv.circle(file_path, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv.FILLED)
-#     return jsonify({"message": "Pose estimation completed"})  # Return a response
+    while True:
+        success, img = cap.read()
+        if not success:
+            break
+
+        imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        print(len(imgRGB))
+        imgRGB = detector.findPose(imgRGB)
+        lmList = detector.findPosition(imgRGB, draw=False)
+        if len(lmList) != 0:
+            cv.circle(imgRGB, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv.FILLED)
+
+        # Append processed frame to the list
+        frame_list.append(cv.cvtColor(imgRGB, cv.COLOR_RGB2BGR))
+
+        # Display the processed frame using OpenCV's imshow (Optional)
+        cv.imshow('Processed Frame', imgRGB)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Release video capture
+    cap.release()
+    cv.destroyAllWindows()
+
+    # Save processed frames to create the processed video
+    processed_video_path = 'static/processed_video.mp4'
+    height, width, layers = frame_list[0].shape
+    fourcc = cv.VideoWriter_fourcc(*'mp4v')  # Codec for video writing (modify based on system support)
+    out = cv.VideoWriter(processed_video_path, fourcc, 30.0, (width, height))
+
+    for frame in frame_list:
+        out.write(frame)
+
+    out.release()
+
+    # Return the path to the processed video
+    return send_file(processed_video_path, as_attachment=False)
+
+
+
+
+
 
 
 
@@ -318,7 +342,44 @@ def scanned_image():
 
 
 
+class poseDetector():
+    def __init__(self, mode=False, upBody=False, smooth=True, detectionCon=0.5, trackCon=0.5):
+        self.mode = mode
+        self.upBody = upBody
+        self.smooth = smooth
+        self.detectionCon = detectionCon
+        self.trackCon = trackCon
+        self.mpDraw = mp.solutions.drawing_utils
+        self.mpPose = mp.solutions.pose
+        # self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth, self.detectionCon, self.trackCon)
+        self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth)
 
+    def findPose(self, img, draw=True):
+
+        self.imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        # Utilizes the pose instance to process the RGB image.
+        self.results = self.pose.process(self.imgRGB)    
+        # If pose landmarks are detected in the image, it draws the landmarks on the original image using mpDraw.draw_landmarks.
+        if self.results.pose_landmarks:
+            if draw:
+                self.mpDraw.draw_landmarks(img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
+            
+        return img 
+    
+    # Takes an image (img) as input and processes it to find the positions of landmarks.
+    def findPosition(self, img, draw=True):
+        lmList = []
+        if self.results.pose_landmarks:
+            # Iterates through the detected landmarks.
+            for id, lm in enumerate(self.results.pose_landmarks.landmark):
+                # Retrieves the (x, y) coordinates of each landmark, scales them according to the image size, and appends them along with the landmark ID to lmList.
+                h, w, c = img.shape
+                # print(id, lm)
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                lmList.append([id, cx, cy])
+                if draw:
+                    cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
+        return lmList
 
 
 if __name__ == '__main__':

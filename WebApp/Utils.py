@@ -48,7 +48,6 @@ def FromImage_To_Red(img):
     red = cv.merge([blank,blank,r])
     return red
 
-
 def Detect_Faces(img):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     haar_cascade = cv.CascadeClassifier('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/TutorialOpenCV/haar_face.xml')
@@ -58,12 +57,9 @@ def Detect_Faces(img):
         cv.rectangle(img, (x,y), (x+w, y+h), (0,255,0), thickness=2)
     return img
 
-
 def Resize_Image(img, width, height):
     img = cv.resize(img, (width, height), cv.INTER_CUBIC)
     return img
-
-
 
 def Segmentation_Image(img):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -81,8 +77,6 @@ def Segmentation_Image(img):
     markers = cv.watershed(img,markers)
     img[markers == -1] = [0,0,255]
     return img
-
-
 
 def From_Image_to_Text():
     pass
@@ -153,46 +147,44 @@ class UtilScanner():
         pass
 
 
-    
+class poseDetector():
+    def __init__(self, mode=False, upBody=False, smooth=True, detectionCon=0.5, trackCon=0.5):
+        self.mode = mode
+        self.upBody = upBody
+        self.smooth = smooth
+        self.detectionCon = detectionCon
+        self.trackCon = trackCon
+        self.mpDraw = mp.solutions.drawing_utils
+        self.mpPose = mp.solutions.pose
+        self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth, self.detectionCon, self.trackCon)
+        # self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth)
 
-# class poseDetector():
-#     def __init__(self, mode=False, upBody=False, smooth=True, detectionCon=0.5, trackCon=0.5):
-#         self.mode = mode
-#         self.upBody = upBody
-#         self.smooth = smooth
-#         self.detectionCon = detectionCon
-#         self.trackCon = trackCon
-#         self.mpDraw = mp.solutions.drawing_utils
-#         self.mpPose = mp.solutions.pose
-#         # self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth, self.detectionCon, self.trackCon)
-#         self.pose = self.mpPose.Pose(self.mode, self.upBody, self.smooth)
+    def findPose(self, img, draw=True):
 
-#     def findPose(self, img, draw=True):
-
-#         self.imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-#         # Utilizes the pose instance to process the RGB image.
-#         self.results = self.pose.process(self.imgRGB)    
-#         # If pose landmarks are detected in the image, it draws the landmarks on the original image using mpDraw.draw_landmarks.
-#         if self.results.pose_landmarks:
-#             if draw:
-#                 self.mpDraw.draw_landmarks(img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
+        self.imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        # Utilizes the pose instance to process the RGB image.
+        self.results = self.pose.process(self.imgRGB)    
+        # If pose landmarks are detected in the image, it draws the landmarks on the original image using mpDraw.draw_landmarks.
+        if self.results.pose_landmarks:
+            if draw:
+                self.mpDraw.draw_landmarks(img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
             
-#         return img 
+        return img 
     
-#     # Takes an image (img) as input and processes it to find the positions of landmarks.
-#     def findPosition(self, img, draw=True):
-#         lmList = []
-#         if self.results.pose_landmarks:
-#             # Iterates through the detected landmarks.
-#             for id, lm in enumerate(self.results.pose_landmarks.landmark):
-#                 # Retrieves the (x, y) coordinates of each landmark, scales them according to the image size, and appends them along with the landmark ID to lmList.
-#                 h, w, c = img.shape
-#                 # print(id, lm)
-#                 cx, cy = int(lm.x * w), int(lm.y * h)
-#                 lmList.append([id, cx, cy])
-#                 if draw:
-#                     cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
-#         return lmList
+    # Takes an image (img) as input and processes it to find the positions of landmarks.
+    def findPosition(self, img, draw=True):
+        lmList = []
+        if self.results.pose_landmarks:
+            # Iterates through the detected landmarks.
+            for id, lm in enumerate(self.results.pose_landmarks.landmark):
+                # Retrieves the (x, y) coordinates of each landmark, scales them according to the image size, and appends them along with the landmark ID to lmList.
+                h, w, c = img.shape
+                # print(id, lm)
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                lmList.append([id, cx, cy])
+                if draw:
+                    cv.circle(img, (cx, cy), 5, (255,0,0), cv.FILLED)
+        return lmList
 
 
 class handDetector():
@@ -279,9 +271,5 @@ class handDetector():
         length = math.hypot(x2 - x1, y2 - y1)
 
         return length, img, [x1, y1, x2, y2, cx, cy]
-
-
-
-
 
 
