@@ -207,59 +207,74 @@ def SegmentationImage():
 
 
 
-
-
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'mp4'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/EditVideo', methods=['GET'])
 def EditVideo():
     return render_template('EditVideo.html')
 
+import os
+from werkzeug.utils import secure_filename
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route("/process_video", methods=["POST"])
 def process_video():
-    video_path = 'C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Gym.mp4'
-    cap = cv.VideoCapture(video_path)
-    detector = poseDetector()
-    frame_list = []  # To store processed frames
+    if 'video' not in request.files:
+        return jsonify({'error': 'No video file received'})
 
-    while True:
-        success, img = cap.read()
-        if not success:
-            break
+    video_file = request.files['video']
 
-        imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        print(len(imgRGB))
-        imgRGB = detector.findPose(imgRGB)
-        lmList = detector.findPosition(imgRGB, draw=False)
-        if len(lmList) != 0:
-            cv.circle(imgRGB, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv.FILLED)
+    if video_file.filename == '':
+        return jsonify({'error': 'No selected file'})
 
-        # Append processed frame to the list
-        frame_list.append(cv.cvtColor(imgRGB, cv.COLOR_RGB2BGR))
+    if video_file and allowed_file(video_file.filename):
+        filename = secure_filename(video_file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-        # Display the processed frame using OpenCV's imshow (Optional)
-        cv.imshow('Processed Frame', imgRGB)
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
+        try:
+            video_file.save(file_path)
+        except Exception as e:
+            return jsonify({'error': f'Failed to save file: {e}'})
 
-    # Release video capture
-    cap.release()
-    cv.destroyAllWindows()
+        cap = cv.VideoCapture('C:/Users/chris/Desktop/Dimitris/Tutorials/OpenCV/OpenCV/ComputerVision/Videos/Gym.mp4')
+        detector = poseDetector()
+        frame_list = []  # To store processed frames
 
-    # Save processed frames to create the processed video
-    processed_video_path = 'static/processed_video.mp4'
-    height, width, layers = frame_list[0].shape
-    fourcc = cv.VideoWriter_fourcc(*'mp4v')  # Codec for video writing (modify based on system support)
-    out = cv.VideoWriter(processed_video_path, fourcc, 30.0, (width, height))
+        while True:
+            success, img = cap.read()
+            if not success:
+                break
 
-    for frame in frame_list:
-        out.write(frame)
+            imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            imgRGB = detector.findPose(imgRGB)
+            # Perform pose estimation and any other processing here
 
-    out.release()
+            frame_list.append(cv.cvtColor(imgRGB, cv.COLOR_RGB2BGR))
 
-    # Return the path to the processed video
-    return send_file(processed_video_path, as_attachment=False)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                break
 
+        cap.release()
+        cv.destroyAllWindows()
+
+        processed_video_path = os.path.join(app.config['PROCESSED_FOLDER'], 'processed_' + filename)
+        height, width, layers = frame_list[0].shape
+        fourcc = cv.VideoWriter_fourcc(*'mp4v')
+        out = cv.VideoWriter(processed_video_path, fourcc, 30.0, (width, height))
+
+        for frame in frame_list:
+            out.write(frame)
+
+        out.release()
+
+        return send_file(processed_video_path, as_attachment=False)
+
+    return jsonify({'error': 'Invalid file format'})
 
 
 

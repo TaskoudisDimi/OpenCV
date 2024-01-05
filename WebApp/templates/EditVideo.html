@@ -9,18 +9,29 @@
 <body>
   <h1>Video Pose Estimation</h1>
 
-  <div>
-    <button id="cameraButton">Open Camera</button>
-    <input type="file" id="videoInput" accept="video/mp4" />
-  </div>
+
+  <input type="file" id="videoInput" accept="video/mp4" />
+  <button id="uploadButton">Upload and Play</button>
 
   <div id="videoContainer">
-    <video id="videoPlayer" controls autoplay></video>
+    <video id="videoPlayer" controls autoplay style="display: none;"></video>
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Pose Estimation -->
   <form id="poseEstimationForm" action="/process_video" method="post" enctype="multipart/form-data">
-    <button type="submit" class="btn btn-primary" id="poseEstimationButton" name="video">
+    <button type="submit" class="btn btn-primary" id="poseEstimationButton" name="videoPoseEstimation">
       Pose Estimation
     </button>
   </form>
@@ -31,16 +42,6 @@
     <!-- Add a video or image element here to display the results -->
   </div>
 
-  <form id="fingerCounting" action="/fingerCounting" method="post" enctype="multipart/form-data">
-    <button type="submit" class="btn btn-primary">Finger Counting</button>
-  </form>
-   <!-- Display Pose Estimation Results -->
-   <div id="fingerCuontingResults">
-    <!-- Display processed video frames or annotated frames -->
-    <!-- Add a video or image element here to display the results -->
-  </div>
-
-
   <form action="/" method="get">
     <button type="submit" class="btn btn-primary">Back</button>
   </form>
@@ -50,54 +51,76 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
   <script>
+    // document.addEventListener("DOMContentLoaded", () => {
+    //   const videoInput = document.getElementById("videoInput");
+    //   const videoPlayer = document.getElementById("videoPlayer");
+    //   const poseEstimationForm = document.getElementById("poseEstimationForm");
+    //   const poseEstimationResults = document.getElementById("poseEstimationResults");
+
     document.addEventListener("DOMContentLoaded", () => {
       const videoInput = document.getElementById("videoInput");
       const videoPlayer = document.getElementById("videoPlayer");
-      const poseEstimationForm = document.getElementById("poseEstimationForm");
-      const poseEstimationButton = document.getElementById("poseEstimationButton");
-      const poseEstimationResults = document.getElementById("poseEstimationResults");
+      const uploadButton = document.getElementById("uploadButton");
 
-      videoInput.addEventListener("change", () => {
-        loadVideo();
-      });
-
-      function loadVideo() {
+      uploadButton.addEventListener("click", () => {
         const file = videoInput.files[0];
         if (file) {
-          const videoURL = URL.createObjectURL(file);
-          videoPlayer.src = videoURL;
-        }
-      }
+          const formData = new FormData();
+          formData.append("video", file);
 
-      poseEstimationForm.addEventListener("submit", event => {
-        event.preventDefault();
-        const file = videoInput.files[0];
-        if (file) {
-          processVideo(file);
-        }
-      });
-
-      function processVideo(videoFile) {
-        const formData = new FormData();
-        formData.append("video", videoFile);
-
-        fetch("/process_video", {
-          method: "POST",
-          body: formData,
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data.message); // Print the response message from the server
-
-            // Display pose estimation results in poseEstimationResults div
-            // You'll need to update this part to display the processed frames
-            poseEstimationResults.innerHTML = '<p>Pose estimation results will be displayed here</p>';
+          fetch("/process_video", {
+            method: "POST",
+            body: formData,
           })
-          .catch(error => {
-            console.error("Error while processing video: ", error);
-          });
-      }
+            .then(response => response.blob())
+            .then(blob => {
+              const processedVideoURL = URL.createObjectURL(blob);
+              videoPlayer.src = processedVideoURL;
+              videoPlayer.style.display = "block"; // Show the video player
+            })
+            .catch(error => {
+              console.error("Error processing video:", error);
+            });
+        }
+      });
     });
+
+
+
+      // poseEstimationForm.addEventListener("submit", event => {
+      //   event.preventDefault();
+      //   const file = videoInput.files[0];
+      //   if (file) {
+      //     processVideo(file);
+      //   }
+      // });
+
+      // function processVideo(videoFile) {
+      //   const formData = new FormData();
+      //   formData.append("video", videoFile);
+
+      //   fetch("/process_video", {
+      //     method: "POST",
+      //     body: formData,
+      //   })
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       const processedVideoPath = data.processed_video_path;
+      //       displayProcessedVideo(processedVideoPath);
+      //     })
+      //     .catch(error => {
+      //       console.error("Error while processing video: ", error);
+      //     });
+      // }
+
+//       function displayProcessedVideo(videoPath) {
+//         console.log("Received processed video path:", videoPath); // Add this line
+
+//         videoPlayer.src = videoPath;
+//         videoPlayer.controls = true;
+//         poseEstimationResults.innerHTML = '<p>Processed video with pose estimation</p>';
+// }
+    // });
   </script>
 </body>
 </html>
