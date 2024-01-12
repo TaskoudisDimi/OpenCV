@@ -279,19 +279,7 @@ def process_video():
 
 
 
-
-
-
 # detector = handDetector()
-
-@app.route('/FingerCounting', methods=['GET'])
-def FingerCounting():
-    return render_template('FingerCounting.html')
-
-
-@app.route('/GetFingers', methods=['GET'])
-def GetFingers():
-    return render_template('GetFingers.html')
 
 
 @app.route('/FaceRecognition', methods=['GET'])
